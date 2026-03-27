@@ -144,7 +144,7 @@ src/main/java
  ┃ ┣ menu
  ┃ ┣ order
  ┃ ┣ payment
- ┃ ┗ point
+ ┃ ┗ pointhistory
  ┣ global
  ┃ ┣ config
  ┃ ┣ exception
