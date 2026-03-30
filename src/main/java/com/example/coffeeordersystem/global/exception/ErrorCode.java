@@ -16,6 +16,10 @@ public enum ErrorCode {
     // ORDER
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "주문을 찾을 수 없습니다."),
 
+    // PAYMENT
+    PAYMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "결제 정보를 찾을 수 없습니다."),
+    PAYMENT_FAILED(HttpStatus.BAD_REQUEST, "결제에 실패했습니다."),
+
     // POINT
     INSUFFICIENT_POINT(HttpStatus.BAD_REQUEST, "포인트가 부족합니다."),
     INVALID_CHARGE_AMOUNT(HttpStatus.BAD_REQUEST, "충전 금액이 올바르지 않습니다."),
