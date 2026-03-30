@@ -1,6 +1,8 @@
 package com.example.coffeeordersystem.domain.user.entity;
 
 import com.example.coffeeordersystem.global.common.entity.BaseEntity;
+import com.example.coffeeordersystem.global.exception.ErrorCode;
+import com.example.coffeeordersystem.global.exception.ServiceException;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,17 +22,24 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private BigDecimal point;
 
-    public static User create() {
-        return User.builder()
-                .point(BigDecimal.ZERO)
-                .build();
-    }
-
     public void charge(BigDecimal amount) {
+        validateAmount(amount);
         this.point = this.point.add(amount);
     }
 
     public void use(BigDecimal amount) {
+        validateAmount(amount);
+
+        if (this.point.compareTo(amount) < 0) {
+            throw new ServiceException(ErrorCode.INSUFFICIENT_POINT);
+        }
+
         this.point = this.point.subtract(amount);
+    }
+
+    private void validateAmount(BigDecimal amount) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new ServiceException(ErrorCode.INVALID_CHARGE_AMOUNT);
+        }
     }
 }
