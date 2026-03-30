@@ -22,11 +22,4 @@ public class Menu extends BaseEntity {
 
     @Column(nullable = false)
     private BigDecimal price;
-
-    public static Menu create(String name, BigDecimal price) {
-        return Menu.builder()
-                .name(name)
-                .price(price)
-                .build();
-    }
 }
