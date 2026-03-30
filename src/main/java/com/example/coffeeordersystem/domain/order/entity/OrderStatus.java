@@ -4,9 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum OrderStatus {
-    WAITING("주문 확인"),
-    PREPARING("조리 중"),
-    COMPLETED( "조리 완료");
+    COMPLETED("주문 완료"),
+    FAILED("주문 실패");
 
     private final String description;
 

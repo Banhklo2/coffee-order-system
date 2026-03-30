@@ -31,16 +31,13 @@ public class Order extends BaseEntity {
 
     private LocalDateTime orderedAt;
 
+    // 주문 생성 = 결제 완료 상태
     public static Order create(User user, BigDecimal totalPrice) {
         return Order.builder()
                 .user(user)
                 .totalPrice(totalPrice)
-                .status(OrderStatus.WAITING)
+                .status(OrderStatus.COMPLETED)
                 .orderedAt(LocalDateTime.now())
                 .build();
-    }
-
-    public void complete() {
-        this.status = OrderStatus.COMPLETED;
     }
 }
