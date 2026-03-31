@@ -14,13 +14,12 @@ import com.example.coffeeordersystem.domain.pointhistory.entity.PointHistory;
 import com.example.coffeeordersystem.domain.pointhistory.repository.PointHistoryRepository;
 import com.example.coffeeordersystem.domain.user.entity.User;
 import com.example.coffeeordersystem.domain.user.repository.UserRepository;
-import com.example.coffeeordersystem.external.client.ExternalOrderClient;
-import com.example.coffeeordersystem.external.dto.ExternalOrderRequest;
-import com.example.coffeeordersystem.external.service.ExternalOrderAsyncService;
+import com.example.coffeeordersystem.external.event.OrderCompletedEvent;
 import com.example.coffeeordersystem.global.exception.ErrorCode;
 import com.example.coffeeordersystem.global.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,13 +35,14 @@ public class OrderService {
     private final UserRepository userRepository;
     private final MenuRepository menuRepository;
     private final PointHistoryRepository pointHistoryRepository;
-    private final ExternalOrderClient externalOrderClient;
-    private final ExternalOrderAsyncService externalOrderAsyncService;
+    private final ApplicationEventPublisher eventPublisher;
 
     // 주문 생성 + 결제
-    // - 메뉴 가격으로 총 금액 계산
-    // - 사용자 포인트 차감
-    // - 주문/주문상품/결제 정보를 함께 저장
+    // - 사용자 / 메뉴 조회
+    // - 주문 및 주문상품 생성
+    // - 포인트 차감 및 포인트 이력 저장
+    // - 결제 성공 / 실패 정보 저장
+    // - 외부 플랫폼 이벤트 발행 (비동기)
     public OrderResponse createOrder(OrderCreateRequest request) {
         log.info("주문 생성 시작 - userId={}, menuId={}", request.getUserId(), request.getMenuId());
 
@@ -69,12 +69,12 @@ public class OrderService {
         paymentRepository.save(payment);
 
         log.info("외부 플랫폼 비동기 전송 요청");
-        externalOrderAsyncService.sendOrderAsync(
-                new ExternalOrderRequest(
-                        user.getId(),
-                        savedOrderItem.getMenu().getId(),
-                        savedOrder.getTotalPrice()
-                )
+        eventPublisher.publishEvent(
+                OrderCompletedEvent.builder()
+                        .userId(user.getId())
+                        .menuId(savedOrderItem.getMenu().getId())
+                        .amount(savedOrder.getTotalPrice())
+                        .build()
         );
         log.info("외부 플랫폼 전송 직후");
 

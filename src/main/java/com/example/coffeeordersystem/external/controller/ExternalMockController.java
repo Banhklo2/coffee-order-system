@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class ExternalMockController {
 
+    // 외부 플랫폼 주문 데이터 수신 (Mock API)
+    // - 주문 완료 후 전송된 데이터 확인용
     @PostMapping
     public ApiResponse<Void> receiveOrder(@RequestBody ExternalOrderRequest request) {
         log.info("외부 플랫폼 주문 데이터 수신 - userId={}, menuId={}, amount={}",

@@ -13,6 +13,8 @@ public class ExternalOrderClient {
 
     private final RestTemplate restTemplate;
 
+    // 외부 플랫폼 주문 전송 클라이언트
+    // - 주문 완료 후 외부 API 호출
     public void sendOrder(ExternalOrderRequest request) {
         try {
             log.info("ExternalOrderClient 진입");
