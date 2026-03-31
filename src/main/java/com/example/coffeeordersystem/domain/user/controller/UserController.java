@@ -30,7 +30,7 @@ public class UserController {
     }
 
     // 사용자 포인트 조회
-    @GetMapping("/{userId}/point")
+    @GetMapping("/{userId}/points")
     public ApiResponse<UserPointResponse> getUserPoint(@PathVariable Long userId) {
         return ApiResponse.ok(userService.getUserPoint(userId));
     }
