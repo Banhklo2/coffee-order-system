@@ -14,15 +14,19 @@ import com.example.coffeeordersystem.domain.pointhistory.entity.PointHistory;
 import com.example.coffeeordersystem.domain.pointhistory.repository.PointHistoryRepository;
 import com.example.coffeeordersystem.domain.user.entity.User;
 import com.example.coffeeordersystem.domain.user.repository.UserRepository;
+import com.example.coffeeordersystem.external.client.ExternalOrderClient;
+import com.example.coffeeordersystem.external.dto.ExternalOrderRequest;
 import com.example.coffeeordersystem.global.exception.ErrorCode;
 import com.example.coffeeordersystem.global.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class OrderService {
 
     private final OrderRepository orderRepository;
@@ -31,12 +35,15 @@ public class OrderService {
     private final UserRepository userRepository;
     private final MenuRepository menuRepository;
     private final PointHistoryRepository pointHistoryRepository;
+    private final ExternalOrderClient externalOrderClient;
 
     // 주문 생성 + 결제
     // - 메뉴 가격으로 총 금액 계산
     // - 사용자 포인트 차감
     // - 주문/주문상품/결제 정보를 함께 저장
     public OrderResponse createOrder(OrderCreateRequest request) {
+        log.info("주문 생성 시작 - userId={}, menuId={}", request.getUserId(), request.getMenuId());
+
         User user = findUser(request.getUserId());
         Menu menu = findMenu(request.getMenuId());
 
@@ -44,7 +51,7 @@ public class OrderService {
         Order savedOrder = orderRepository.save(order);
 
         OrderItem orderItem = OrderItem.create(savedOrder, menu);
-        orderItemRepository.save(orderItem);
+        OrderItem savedOrderItem = orderItemRepository.save(orderItem);
 
         Payment payment;
         try {
@@ -52,7 +59,7 @@ public class OrderService {
 
             pointHistoryRepository.save(PointHistory.use(user, menu.getPrice()));
 
-            payment = Payment.success(order, user, menu.getPrice());
+            payment = Payment.success(savedOrder, user, menu.getPrice());
         } catch (ServiceException e) {
             payment = Payment.fail(order, user, menu.getPrice());
             paymentRepository.save(payment);
@@ -61,7 +68,17 @@ public class OrderService {
 
         paymentRepository.save(payment);
 
-        return OrderResponse.from(order);
+        log.info("외부 플랫폼 전송 직전");
+        externalOrderClient.sendOrder(
+                new ExternalOrderRequest(
+                        user.getId(),
+                        savedOrderItem.getMenu().getId(),
+                        savedOrder.getTotalPrice()
+                )
+        );
+        log.info("외부 플랫폼 전송 직후");
+
+        return OrderResponse.from(savedOrder);
     }
 
     // 주문 단건 조회
