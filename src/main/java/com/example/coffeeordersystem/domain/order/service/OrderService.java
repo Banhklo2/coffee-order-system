@@ -16,6 +16,7 @@ import com.example.coffeeordersystem.domain.user.entity.User;
 import com.example.coffeeordersystem.domain.user.repository.UserRepository;
 import com.example.coffeeordersystem.external.client.ExternalOrderClient;
 import com.example.coffeeordersystem.external.dto.ExternalOrderRequest;
+import com.example.coffeeordersystem.external.service.ExternalOrderAsyncService;
 import com.example.coffeeordersystem.global.exception.ErrorCode;
 import com.example.coffeeordersystem.global.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,7 @@ public class OrderService {
     private final MenuRepository menuRepository;
     private final PointHistoryRepository pointHistoryRepository;
     private final ExternalOrderClient externalOrderClient;
+    private final ExternalOrderAsyncService externalOrderAsyncService;
 
     // 주문 생성 + 결제
     // - 메뉴 가격으로 총 금액 계산
@@ -56,9 +58,7 @@ public class OrderService {
         Payment payment;
         try {
             user.use(menu.getPrice());
-
             pointHistoryRepository.save(PointHistory.use(user, menu.getPrice()));
-
             payment = Payment.success(savedOrder, user, menu.getPrice());
         } catch (ServiceException e) {
             payment = Payment.fail(order, user, menu.getPrice());
@@ -68,8 +68,8 @@ public class OrderService {
 
         paymentRepository.save(payment);
 
-        log.info("외부 플랫폼 전송 직전");
-        externalOrderClient.sendOrder(
+        log.info("외부 플랫폼 비동기 전송 요청");
+        externalOrderAsyncService.sendOrderAsync(
                 new ExternalOrderRequest(
                         user.getId(),
                         savedOrderItem.getMenu().getId(),
