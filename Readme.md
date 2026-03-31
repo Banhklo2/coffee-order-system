@@ -140,26 +140,55 @@
 ## 📁 프로젝트 구조
 
 ```plaintext
-src/main/java/com/example/coffeeordersystem
-├── domain
-│   ├── menu
-│   ├── order
-│   ├── payment
-│   ├── pointhistory
-│   └── user
-├── external
-│   ├── client
-│   ├── controller
-│   └── dto
-├── global
-│   ├── config
-│   ├── exception
-│   └── common
-└── CoffeeOrderSystemApplication
-
-src/main/resources
-├── application.properties
-└── data.sql
-
-src/test
+src
+├─ main
+│  ├─ java
+│  │  └─ com.example.coffeeordersystem
+│  │     ├─ domain
+│  │     │  ├─ menu
+│  │     │  ├─ order
+│  │     │  ├─ payment
+│  │     │  ├─ pointhistory
+│  │     │  └─ user
+│  │     ├─ external
+│  │     │  ├─ client
+│  │     │  ├─ controller
+│  │     │  ├─ dto
+│  │     │  └─ event
+│  │     ├─ global
+│  │     │  ├─ common
+│  │     │  ├─ config
+│  │     │  └─ exception
+│  │     └─ CoffeeOrderSystemApplication
+│  └─ resources
+│     ├─ application.properties
+│     └─ data.sql
+└─ test
+   └─ java
+      └─ com.example.coffeeordersystem
+         └─ CoffeeOrderSystemApplicationTests
 ```
+
+---
+
+## 🚀 외부 플랫폼 전송 개선
+
+위 설계를 기반으로 구현을 진행하면서  
+외부 플랫폼 전송 방식에 대해 다음과 같은 개선을 적용했습니다.
+
+기존에는 `@Async`를 사용하여 외부 API를 비동기로 호출했습니다.
+
+하지만 트랜잭션과 분리되지 않아  
+롤백 상황에서도 외부 API가 호출될 수 있는 문제가 있었습니다.
+
+→ 이를 해결하기 위해 이벤트 기반 비동기 구조로 개선했습니다.
+
+```java
+@Async
+@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+```
+
+### 개선 효과
+- 트랜잭션과 외부 API 호출 분리
+- commit 이후 실행으로 데이터 정합성 보장
+- 확장 가능한 구조 확보
