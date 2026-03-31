@@ -18,17 +18,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ServiceException.class)
     public ResponseEntity<ApiResponse<ExceptionResponse>> handleServiceException(
             ServiceException exception,
-            HttpServletRequest request) {
-
-        ExceptionResponse response = ExceptionResponse.from(
-                exception.getStatus().value(),
-                exception.getErrorCode().getMessage(),
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(
+                exception.getStatus(),
+                exception.getErrorCode(),
                 request.getRequestURI()
         );
-
-        return ResponseEntity
-                .status(exception.getStatus())
-                .body(ApiResponse.fail(exception.getStatus(), response));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -41,15 +37,12 @@ public class GlobalExceptionHandler {
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .orElse("입력 값이 올바르지 않습니다.");
 
-        ExceptionResponse response = ExceptionResponse.from(
-                exception.getStatusCode().value(),
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                ErrorCode.INVALID_REQUEST,
                 errorMessage,
                 request.getRequestURI()
         );
-
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.fail(HttpStatus.BAD_REQUEST, response));
     }
 
     @ExceptionHandler(Exception.class)
@@ -59,14 +52,35 @@ public class GlobalExceptionHandler {
     ) {
         log.error("Unhandled exception occurred", exception);
 
-        ExceptionResponse response = ExceptionResponse.from(
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                ErrorCode.INTERNAL_SERVER_ERROR.getMessage(),
+        return buildErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                ErrorCode.INTERNAL_SERVER_ERROR,
                 request.getRequestURI()
         );
+    }
+
+    private ResponseEntity<ApiResponse<ExceptionResponse>> buildErrorResponse(
+            HttpStatus status,
+            ErrorCode errorCode,
+            String path
+    ) {
+        ExceptionResponse response = ExceptionResponse.from(errorCode, path);
 
         return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.fail(HttpStatus.INTERNAL_SERVER_ERROR, response));
+                .status(status)
+                .body(ApiResponse.fail(status, response));
+    }
+
+    private ResponseEntity<ApiResponse<ExceptionResponse>> buildErrorResponse(
+            HttpStatus status,
+            ErrorCode errorCode,
+            String message,
+            String path
+    ) {
+        ExceptionResponse response = ExceptionResponse.from(errorCode, message, path);
+
+        return ResponseEntity
+                .status(status)
+                .body(ApiResponse.fail(status, response));
     }
 }

@@ -16,4 +16,8 @@ public class ServiceException extends RuntimeException {
     public HttpStatus getStatus() {
         return errorCode.getStatus();
     }
+
+    public ErrorCode getErrorCode() {
+        return errorCode;
+    }
 }
