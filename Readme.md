@@ -137,19 +137,29 @@
 
 ---
 
-## 📂 프로젝트 구조
+## 📁 프로젝트 구조
 
 ```plaintext
-src/main/java
- ┣ domain
- ┃ ┣ user
- ┃ ┣ menu
- ┃ ┣ order
- ┃ ┣ payment
- ┃ ┗ pointhistory
- ┣ global
- ┃ ┣ config
- ┃ ┣ exception
- ┃ ┗ common
- ┗ external
+src/main/java/com/example/coffeeordersystem
+├── domain
+│   ├── menu
+│   ├── order
+│   ├── payment
+│   ├── pointhistory
+│   └── user
+├── external
+│   ├── client
+│   ├── controller
+│   └── dto
+├── global
+│   ├── config
+│   ├── exception
+│   └── common
+└── CoffeeOrderSystemApplication
+
+src/main/resources
+├── application.properties
+└── data.sql
+
+src/test
 ```
