@@ -15,24 +15,16 @@ public class ApiResponse<T> {
     private final int code;
     private final T data;
 
-    public static <T> ApiResponse<T> ok() {
-        return new ApiResponse<>(true, 200, null);
-    }
-
     public static <T> ApiResponse<T> ok(T data) {
-        return new ApiResponse<>(true, 200, data);
+        return new ApiResponse<>(true, HttpStatus.OK.value(), data);
     }
 
     public static <T> ApiResponse<T> created(T data) {
-        return new ApiResponse<>(true, 201, data);
+        return new ApiResponse<>(true, HttpStatus.CREATED.value(), data);
     }
 
     public static <T> ApiResponse<T> noContent() {
-        return new ApiResponse<>(true, 204, null);
-    }
-
-    public static <T> ApiResponse<T> fail(HttpStatus status) {
-        return new ApiResponse<>(false, status.value(), null);
+        return new ApiResponse<>(true, HttpStatus.NO_CONTENT.value(), null);
     }
 
     public static <T> ApiResponse<T> fail(HttpStatus status, T data) {
