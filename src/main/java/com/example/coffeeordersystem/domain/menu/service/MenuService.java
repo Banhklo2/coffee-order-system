@@ -1,6 +1,5 @@
 package com.example.coffeeordersystem.domain.menu.service;
 
-
 import com.example.coffeeordersystem.domain.menu.dto.response.MenuResponse;
 import com.example.coffeeordersystem.domain.menu.dto.response.PopularMenuResponse;
 import com.example.coffeeordersystem.domain.menu.entity.Menu;
