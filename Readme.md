@@ -118,13 +118,13 @@
 
 ---
 
-# 📖 API 명세서
+## 📖 API 명세서
 
 | 기능 분류 | 기능명 | API Path | Method |
 |----------|--------|----------|--------|
 | user | 사용자 목록 조회 | `/api/users` | GET |
 | user | 사용자 단건 조회 | `/api/users/{userId}` | GET |
-| user | 사용자 포인트 조회 | `/api/users/{userId}/point` | GET |
+| user | 사용자 포인트 조회 | `/api/users/{userId}/points` | GET |
 | user | 포인트 충전 | `/api/users/{userId}/points/charge` | POST |
 | menu | 메뉴 목록 조회 | `/api/menus` | GET |
 | menu | 메뉴 단건 조회 | `/api/menus/{menuId}` | GET |
@@ -134,7 +134,6 @@
 | order_item | 주문 상품 조회 | `/api/orders/{orderId}/items` | GET |
 | payment | 결제 정보 조회 | `/api/payments/{orderId}` | GET |
 | pointhistory | 포인트 이력 조회 | `/api/points/history/{userId}` | GET |
-| external | 외부 플랫폼 전송 (Mock) | `/external/orders` | POST |
 
 ---
 
