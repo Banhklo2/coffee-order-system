@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 @Entity
 @Builder
-@Table(name = "orders")
+@Table(name = "orders", indexes = {@Index(name = "idx_order_created_at", columnList = "created_at")})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Order extends BaseEntity {
