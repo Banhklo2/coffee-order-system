@@ -192,3 +192,47 @@ src
 - 트랜잭션과 외부 API 호출 분리
 - commit 이후 실행으로 데이터 정합성 보장
 - 확장 가능한 구조 확보
+
+---
+
+## 🔒 포인트 차감 동시성 제어 개선
+
+포인트 차감 과정에서 동시성 문제에 대해 다음과 같은 개선을 적용했습니다.
+
+기존에는 여러 요청이 동시에 들어올 경우  
+동일한 포인트를 기준으로 중복 차감이 발생할 수 있는 구조였습니다.
+
+→ 이를 해결하기 위해 사용자 조회 시 비관적 락(Pessimistic Lock)을 적용했습니다.
+
+```java
+@Lock(LockModeType.PESSIMISTIC_WRITE)
+```
+
+### 개선 효과
+- 동시 요청 상황에서 포인트 정합성 보장
+- 중복 차감 방지
+- 결제 처리 안정성 향상
+
+---
+
+## ⚡ 인기 메뉴 조회 성능 개선
+
+인기 메뉴 조회 과정에서
+최근 7일 데이터 조회 시 Full Table Sacn이 발생할 수 있는 구조였습니다.
+
+→ 이를 개선하기 위해 `Order.created_at` 컬럼에 인덱스를 추가했습니다.
+
+```java
+@Table(
+    name = "orders",
+    indexes = {
+        @Index(name = "idx_order_created_at", columnList = "created_at")
+    }
+)
+```
+
+### 개선 효과
+- Full Table Scan → 인덱스 기반 조회로 개선
+- range scan 기반 조회 수행
+- 인기 메뉴 조회 성능 개선
+- EXPLAIN을 통해 인덱스 사용 여부 검증
