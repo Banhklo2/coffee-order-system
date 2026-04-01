@@ -46,7 +46,7 @@ public class OrderService {
     public OrderResponse createOrder(OrderCreateRequest request) {
         log.info("주문 생성 시작 - userId={}, menuId={}", request.getUserId(), request.getMenuId());
 
-        User user = findUser(request.getUserId());
+        User user = findUserWithLock(request.getUserId());
         Menu menu = findMenu(request.getMenuId());
 
         Order order = Order.create(user, menu.getPrice());
@@ -92,6 +92,13 @@ public class OrderService {
     // - userId로 조회 후 없으면 예외 발생
     private User findUser(Long userId) {
         return userRepository.findById(userId)
+                .orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    // 포인트 차감용 사용자 조회
+    // - 비관적 락 적용
+    private User findUserWithLock(Long userId) {
+        return userRepository.findByIdWithPessimisticLock(userId)
                 .orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
     }
 
