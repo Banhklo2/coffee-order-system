@@ -77,10 +77,7 @@ class OrderServiceConcurrencyTest {
                 try {
                     startLatch.await(); // 모든 스레드 동시에 실행
 
-                    OrderCreateRequest request = OrderCreateRequest.builder()
-                            .userId(user.getId())
-                            .menuId(menu.getId())
-                            .build();
+                    OrderCreateRequest request = new OrderCreateRequest(user.getId(), menu.getId());
 
                     orderService.createOrder(request);
                     successCount.incrementAndGet();
