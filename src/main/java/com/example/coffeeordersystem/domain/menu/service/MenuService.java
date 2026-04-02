@@ -7,6 +7,8 @@ import com.example.coffeeordersystem.domain.menu.repository.MenuRepository;
 import com.example.coffeeordersystem.global.exception.ErrorCode;
 import com.example.coffeeordersystem.global.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +19,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class MenuService {
 
     private final MenuRepository menuRepository;
@@ -35,7 +38,9 @@ public class MenuService {
     }
 
     // 인기 메뉴 조회 (최근 7일, 상위 3개)
+    @Cacheable(value = "popularMenus")
     public List<PopularMenuResponse> getPopularMenus() {
+        log.info("인기 메뉴 DB 조회 실행");
         LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
         return menuRepository.findPopularMenus(sevenDaysAgo, PageRequest.of(0, 3));
     }
