@@ -19,6 +19,7 @@ import com.example.coffeeordersystem.global.exception.ErrorCode;
 import com.example.coffeeordersystem.global.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +44,7 @@ public class OrderService {
     // - 포인트 차감 및 포인트 이력 저장
     // - 결제 성공 / 실패 정보 저장
     // - 외부 플랫폼 이벤트 발행 (비동기)
+    @CacheEvict(value = "popularMenus", allEntries = true)
     public OrderResponse createOrder(OrderCreateRequest request) {
         log.info("주문 생성 시작 - userId={}, menuId={}", request.getUserId(), request.getMenuId());
 
