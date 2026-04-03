@@ -6,6 +6,7 @@ import com.example.coffeeordersystem.domain.order.dto.response.OrderResponse;
 import com.example.coffeeordersystem.domain.order.service.OrderItemService;
 import com.example.coffeeordersystem.domain.order.service.OrderService;
 import com.example.coffeeordersystem.global.common.dto.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +22,7 @@ public class OrderController {
 
     // 주문 생성 + 결제
     @PostMapping
-    public ApiResponse<OrderResponse> createOrder(@RequestBody OrderCreateRequest request) {
+    public ApiResponse<OrderResponse> createOrder(@RequestBody @Valid OrderCreateRequest request) {
         return ApiResponse.created(orderService.createOrder(request));
     }
 
