@@ -5,6 +5,7 @@ import com.example.coffeeordersystem.domain.user.dto.response.UserPointResponse;
 import com.example.coffeeordersystem.domain.user.dto.response.UserResponse;
 import com.example.coffeeordersystem.domain.user.service.UserService;
 import com.example.coffeeordersystem.global.common.dto.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,7 +40,7 @@ public class UserController {
     @PostMapping("/{userId}/points/charge")
     public ApiResponse<UserPointResponse> chargePoint(
             @PathVariable Long userId,
-            @RequestBody UserChargeRequest request
+            @RequestBody @Valid UserChargeRequest request
     ) {
         return ApiResponse.ok(userService.chargePoint(userId, request));
     }
